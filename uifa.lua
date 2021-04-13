@@ -17,7 +17,7 @@ u8 = encoding.UTF8
 
 update_state = false
 
-local script_vers = 3
+local script_vers = 2
 local script_vers_text = "0.9b"
 
 local script_url = "https://raw.githubusercontent.com/yuunusarslann/uifa/master/uifa.lua"
@@ -925,7 +925,7 @@ function main()
 		if status == dlstatus.STATUS_ENDDOWNLOADDATA then
 			updateIni = inicfg.load(nil, update_path)
 			if tonumber(updateIni.info.vers) > script_vers then
-				sampAddChatMessage("[UIFA] {00FF00}Update Success! Current Version: " .. updateIni.info.vers_text)
+				sampAddChatMessage("[UIFA] {FFFFFF}New version of UIFA has been released! {00FF00}" .. updateIni.info.vers_text, 0x00FFFF)
 				update_state = true
 			end
 			os.remove(update_path)
