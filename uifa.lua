@@ -925,7 +925,7 @@ function main()
 		if status == dlstatus.STATUS_ENDDOWNLOADDATA then
 			updateIni = inicfg.load(nil, update_path)
 			if tonumber(updateIni.info.vers) > script_vers then
-				sampAddChatMessage("[UIFA] {FFFFFF}New version of UIFA has been released!", 0x00FFFF)
+				sampAddChatMessage("[UIFA] {FFFFFF}New version of UIFA has been released! {00FF00}", 0x00FFFF)
 				update_state = true
 			end
 			os.remove(update_path)
@@ -938,7 +938,7 @@ function main()
 		if update_state then
 			downloadUrlToFile(script_url, script_path, function(id, status)
 				if status == dlstatus.STATUS_ENDDOWNLOADDATA then
-					sampAddChatMessage("Something happened!", 0xFF0000)
+				sampAddChatMessage("[UIFA] {FFFFFF}UIFA's new version has been downloaded and installed! {00FF00}", 0x00FFFF)
 					thisScript():reload()
 				end
 			end)
