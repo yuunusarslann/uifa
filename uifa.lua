@@ -17,8 +17,8 @@ u8 = encoding.UTF8
 
 update_state = false
 
-local script_vers = 2
-local script_vers_text = "0.9a"
+local script_vers = 3
+local script_vers_text = "0.9b"
 
 local script_url = "https://raw.githubusercontent.com/yuunusarslann/uifa/master/uifa.lua"
 local script_path = thisScript().path
