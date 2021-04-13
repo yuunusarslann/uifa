@@ -4,11 +4,27 @@ script_version_number(1)
 script_moonloader(025)
 script_author('Kraxar')
 
-require 'lib.moonloader'
+require "lib.moonloader"
 require 'lib.sampfuncs'
 local SE = require 'lib.samp.events'
+local dlstatus = require('moonloader').download_status
+local inicfg = require 'inicfg'
+local keys = require "vkeys"
+local imgui = require 'imgui'
+local encoding = require 'encoding'
+encoding.default = "CP1251"
+u8 = encoding.UTF8
 
-local uifa_version = "0.9b"
+update_state = false
+
+local script_vers = 2
+local script_vers_text = "0.9a"
+
+local script_url = "https://raw.githubusercontent.com/yuunusarslann/uifa/master/uifa.lua"
+local script_path = thisScript().path
+
+local update_url = "https://raw.githubusercontent.com/yuunusarslann/uifa/master/update.ini"
+local update_path = getWorkingDirectory() .. "/update.ini"
 
 local commands = {
 --Level 1 Commands
@@ -887,21 +903,48 @@ VITA
 ]]
 
 function main()
-	repeat wait(0) until isSampAvailable()
-		wait(100)
-			sampAddChatMessage("[UIFA]: {FFFFFF}UIF Assistant v0.9b - {00FF00}/help", 0x00FFFF)
-			sampRegisterChatCommand('help', help)
-			sampRegisterChatCommand("adisc", functionUAadisc)   
-			sampRegisterChatCommand("check", functionUAcheck)
-			sampRegisterChatCommand("uifavers", functionUAvers)			
-			sampRegisterChatCommand("relog", functionUArelog) 
-			sampRegisterChatCommand("reconnect", functionUAreconnect) 
-			sampRegisterChatCommand('bss', bss)
-			sampRegisterChatCommand('bst', bst)
-			sampRegisterChatCommand('bsv', bsv)
-			sampRegisterChatCommand('munban', munban)
-	while true do
+	if not isSampLoaded() or not isSampfuncsLoaded() then return end
+	while not isSampAvailable() do wait(100) end
+
+	sampAddChatMessage("[UIFA]: {FFFFFF}UIF Assistant v0.9a - {00FF00}/help", 0x00FFFF)
+	sampRegisterChatCommand('help', help)
+	sampRegisterChatCommand("adisc", functionUAadisc)   
+	sampRegisterChatCommand("check", functionUAcheck)
+	sampRegisterChatCommand("uifavers", functionUAvers)			
+	sampRegisterChatCommand("relog", functionUArelog) 
+	sampRegisterChatCommand("reconnect", functionUAreconnect) 
+	sampRegisterChatCommand('bss', bss)
+	sampRegisterChatCommand('bst', bst)
+	sampRegisterChatCommand('bsv', bsv)
+	sampRegisterChatCommand('munban', munban)
+
+	_, id = sampGetPlayerIdByCharHandle(PLAYER_PED)
+	nick = sampGetPlayerNickname(id)
+
+	downloadUrlToFile(update_url, update_path, function(id, status)
+		if status == dlstatus.STATUS_ENDDOWNLOADDATA then
+			updateIni = inicfg.load(nil, update_path)
+			if tonumber(updateIni.info.vers) > script_vers then
+				sampAddChatMessage("[UIFA] {00FF00}Update Success! Current Version: " .. updateIni.info.vers_text)
+				update_state = true
+			end
+			os.remove(update_path)
+		end
+	end)
+
+	while true do 
 		wait(0)
+
+		if update_state then
+			downloadUrlToFile(script_url, script_path, function(id, status)
+				if status == dlstatus.STATUS_ENDDOWNLOADDATA then
+					sampAddChatMessage("Something happened!", 0xFF0000)
+					thisScript():reload()
+				end
+			end)
+			break
+		end
+
 	end
 end
 
@@ -1025,7 +1068,7 @@ function functionUAcheck(check)
 end
 
 function functionUAvers(check)
-	sampAddChatMessage(string.format('UIFA is on version ' .. uifa_version), 0xFF0000)
+	sampAddChatMessage(string.format('UIFA is on version ' .. script_vers_text), 0xFF0000)
 end
 
 function functionUAadisc()
